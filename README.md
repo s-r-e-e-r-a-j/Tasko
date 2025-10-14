@@ -21,3 +21,12 @@
 - Built-in **debug logging** for easy testing.
 
 - Fully compatible with **Arduino IDE**, **PlatformIO**, and **ESP-IDF** based **setups**.
+
+## Installation
+
+1. Download `Tasko.h` and place it in your project folder.
+
+2. Include the header in your sketch:
+```cpp
+#include "Tasko.h"
+```
