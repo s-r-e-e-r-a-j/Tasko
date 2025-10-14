@@ -65,7 +65,7 @@ Returns the task ID of the newly created task on success (from `0` to `TASKO_MAX
 
 - **func** → Function to execute (callback).
 
-- **arg** → A pointer to any data you want to pass to the task. Use `NULL` if no data needs to be passed.
+- **arg** → A pointer to a single piece of data that will be passed to the task callback function when it runs. Use `NULL` if no data needs to be passed. Only one argument is directly supported.
 
 - **intervalMs** → The time in **milliseconds** before the task runs again. For one-time tasks, it represents the delay before execution.
 
