@@ -63,21 +63,21 @@ The function `TaskoAdd` **creates and starts a task** in Tasko. It can either be
 
 Returns the task ID of the newly created task on success (from `0` to `TASKO_MAX_TASKS - 1`), or `-1` if the maximum number of tasks has been reached.
 
-- **func** → Function to execute (callback).
+- **func** → The task callback function that will be executed by Tasko when the task runs
 
 - **arg** → A pointer to a single piece of data that will be passed to the task callback function when it runs. Use `NULL` if no data needs to be passed. Only one argument is directly supported.
 
 - **intervalMs** → The time in **milliseconds** before the task runs again. For one-time tasks, it represents the delay before execution.
 
-- **repeat** → `true` for repeating tasks, `false` for one-time execution.
+- **repeat** → Set to `true` if the task should repeat at regular intervals. Set to `false` if the task should run only once.
 
 - **priority** → Defines how important the task is compared to others. Tasks with higher priority values are given more CPU time. Default is 1.
 
 - **core** → The CPU core number on which the task will run (`default = 1`). On dual-core boards like the ESP32, you can choose core 0 or core 1. On single-core boards, FreeRTOS runs the task on the only available core.
 
-- **startHook** → Optional function called before task starts.
+- **startHook** → Optional function called before the task callback function runs.
 
-- **stopHook** → Optional function called after task finishes.
+- **stopHook** → Optional function called after the task callback function finishes.
 
 **Example**
 
