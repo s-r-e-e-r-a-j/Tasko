@@ -44,7 +44,7 @@ static inline void TaskoLog(const char* msg) {
     if (taskoDebug) Serial.println(msg);
 }
 
-static inline int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool repeat,
+static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool repeat,
                            uint8_t priority = 1, uint8_t core = 1,
                            TaskoHook startHook = NULL, TaskoHook stopHook = NULL) {
     if (taskCount >= TASKO_MAX_TASKS) return -1;
@@ -102,7 +102,7 @@ static inline int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, b
     return taskCount++;
 }
 
-static inline void TaskoRemove(int id) {
+static void TaskoRemove(int id) {
     if (id < 0 || id >= taskCount) return;
     TaskoTask* t = &taskList[id];
     t->active = false;
@@ -111,13 +111,13 @@ static inline void TaskoRemove(int id) {
     if (taskoDebug) TaskoLog("Removed task");
 }
 
-static inline void TaskoClearAll() {
+static void TaskoClearAll() {
     for (uint8_t i = 0; i < taskCount; i++) TaskoRemove(i);
     taskCount = 0;
     if (taskoDebug) TaskoLog("Cleared all tasks");
 }
 
-static inline void TaskoPause(int id) {
+static void TaskoPause(int id) {
     if (id < 0 || id >= taskCount) return;
     TaskoTask* t = &taskList[id];
     t->active = false;
@@ -125,7 +125,7 @@ static inline void TaskoPause(int id) {
     if (taskoDebug) TaskoLog("Paused task");
 }
 
-static inline void TaskoResume(int id) {
+static void TaskoResume(int id) {
     if (id < 0 || id >= taskCount) return;
     TaskoTask* t = &taskList[id];
     t->active = true;
