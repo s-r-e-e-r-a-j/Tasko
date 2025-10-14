@@ -190,3 +190,6 @@ void TaskoResume(int id);
 TaskoResume(blinkTaskId); // Resumes the blink task
 ```
 
+## License
+This project is licensed under the MIT License
+
