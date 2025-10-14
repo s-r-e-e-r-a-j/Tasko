@@ -75,9 +75,9 @@ Returns the task ID of the newly created task on success (from `0` to `TASKO_MAX
 
 - **core** → The CPU core number on which the task will run (`default = 1`). On dual-core boards like the ESP32, you can choose core 0 or core 1. On single-core boards, FreeRTOS runs the task on the only available core.
 
-- **startHook** → Optional function called before the task callback function runs.
+- **startHook** → Optional function called automatically before the task callback function runs. Tasko passes the task ID as an argument. **You must define the function with `int id` as a parameter**.
 
-- **stopHook** → Optional function called after the task callback function finishes.
+- **stopHook** → Optional function called automatically after the task callback function finishes. Tasko passes the task ID as an argument. **You must define the function with `int id` as a parameter**.
 
 **Example**
 
