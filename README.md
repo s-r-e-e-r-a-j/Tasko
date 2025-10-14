@@ -136,3 +136,57 @@ void loop() {
 
 
 ```
+
+3. **Remove a Task**
+```c
+void TaskoRemove(int id);
+```
+
+**Parameters:**
+
+**id** → Task ID returned by `TaskoAdd`.
+
+**Example:**
+```c
+TaskoRemove(blinkTaskId); // Removes the repeating blink task
+```
+
+4. **Clear All Tasks**
+```c
+void TaskoClearAll();
+```
+
+**Description**: Removes all tasks currently managed by Tasko.
+
+**Example:**
+```c
+TaskoClearAll();
+```
+
+5. **Pause a Task**
+```c
+void TaskoPause(int id);
+```
+
+**Parameters**:
+
+**id** → Task ID returned by `TaskoAdd`.
+
+**Example:**
+```c
+TaskoPause(blinkTaskId); // Pauses the blink task
+```
+
+6. **Resume a Task**
+```c
+void TaskoResume(int id);
+```
+**Parameters:**
+
+**id** → Task ID returned by `TaskoAdd`.
+
+**Example**:
+```c
+TaskoResume(blinkTaskId); // Resumes the blink task
+```
+
