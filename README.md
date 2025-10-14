@@ -4,23 +4,23 @@
 
 ## Features
 
-- Header-only, no `.c` files required.
+- Header-only library, no additional `.c` files required.
 
-- Supports **repeating and one-time tasks.**
-  
-- **Dual-core scheduling** for ESP32 (pin tasks to core 0 or 1).
+- Supports both repeating and one-time tasks.
 
-- **Task priorities** for FreeRTOS scheduling.
+- Dual-core scheduling on ESP32, allowing tasks to be pinned to core 0 or core 1.
 
-- **Start/Stop hooks** for task lifecycle events.
+- Task priorities compatible with FreeRTOS scheduling.
 
-- **Pause/Resume** individual tasks.
+- Start and stop hooks for running custom code before and after each task.
 
-- **Remove tasks safely** or **clear all tasks**.
+- Pause and resume individual tasks at any time.
 
-- Built-in **debug logging** for easy testing.
+- Remove specific tasks safely or clear all tasks at once.
 
-- Fully compatible with **Arduino IDE**, **PlatformIO**, and **ESP-IDF** based **setups**.
+- Built-in debug logging to make testing and troubleshooting easier.
+
+Fully compatible with Arduino IDE, PlatformIO, and ESP-IDF-based projects.
 
 ## Installation
 
