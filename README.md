@@ -74,3 +74,61 @@ Returns the **task ID** (0–15) on success, or **-1** if the task limit is reac
 - **startHook** → Optional function called before task starts.
 
 - **stopHook** → Optional function called after task finishes.
+
+**Example**
+
+```c
+
+#include <Arduino.h>
+#include "Tasko.h"
+
+// Define the LED pin for boards that do not have LED_BUILTIN defined
+#ifndef LED_BUILTIN
+#define LED_BUILTIN 2  // Change this to your board's built-in LED pin if necessary
+#endif
+
+// This function blinks the built-in LED
+void blinkTask(void* arg) {
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+}
+
+// This function runs only once and prints a message to the Serial monitor
+void runOnce(void* arg) {
+    Serial.println("One-time task executed");
+}
+
+// This function is called before a task starts
+void onStart(int id) {
+    Serial.printf("Task %d started\n", id);
+}
+
+// This function is called after a task finishes
+void onStop(int id) {
+    Serial.printf("Task %d stopped\n", id);
+}
+
+void setup() {
+    // Start the Serial monitor for output
+    Serial.begin(115200);
+
+    // Set the built-in LED pin as output
+    pinMode(LED_BUILTIN, OUTPUT);
+
+    // Enable debug messages from Tasko
+    TaskoEnableDebug(true);
+
+    // Add a repeating task that blinks the LED every 1000 milliseconds
+    // The startHook and stopHook functions are called before and after each execution
+    int blinkId = TaskoAdd(blinkTask, NULL, 1000, true, 1, 1, onStart, onStop);
+
+    // Add a one-time task that prints a message
+    // The startHook and stopHook functions are also called for this task
+    int onceId = TaskoAdd(runOnce, NULL, 0, false, 1, 1, onStart, onStop);
+}
+
+void loop() {
+    // Nothing needs to be done in the loop because Tasko handles tasks automatically
+}
+
+
+```
