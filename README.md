@@ -20,7 +20,7 @@
 
 - Built-in debug logging to make testing and troubleshooting easier.
 
-Fully compatible with Arduino IDE, PlatformIO, and ESP-IDF-based projects.
+- Fully compatible with Arduino IDE, PlatformIO, and ESP-IDF-based projects.
 
 ## Installation
 
