@@ -95,7 +95,7 @@ static void TaskoTimerCallback(TimerHandle_t xTimer) {
 static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool repeat,
                     uint8_t priority, uint8_t core,
                     TaskoHook startHook, TaskoHook stopHook,
-                    size_t stackSize = 4096) {
+                    size_t stackSize) {
 
     if (taskCount >= TASKO_MAX_TASKS) return -1;
 
