@@ -80,7 +80,7 @@ Returns the task ID of the newly created task on success (from `0` to `TASKO_MAX
 - **stopHook** → Optional function called automatically after the task callback function finishes. Tasko passes the task ID as an argument. **You must define the function with `int id` as a parameter**.pass `NULL` if not needed
 
 - **stackSize** → The amount of memory (in bytes) the task can use for its variables and function calls. Make it big enough so the task doesn’t crash, but not too big to waste memory. Example: `4096`.
-- 
+
 
 **Example**
 
