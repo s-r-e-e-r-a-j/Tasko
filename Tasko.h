@@ -66,7 +66,7 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
             "TaskoTimer",
             pdMS_TO_TICKS(intervalMs),
             pdTRUE,
-            (void*)(intptr_t)taskCount,
+            (void*)(intptr_t)id,
             [](TimerHandle_t xTimer) {
                 int idx = (int)(intptr_t)pvTimerGetTimerID(xTimer);
                 if (taskList[idx].active) {
