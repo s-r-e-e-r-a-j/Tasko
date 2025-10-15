@@ -49,7 +49,8 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
                            TaskoHook startHook = NULL, TaskoHook stopHook = NULL) {
     if (taskCount >= TASKO_MAX_TASKS) return -1;
 
-    TaskoTask* t = &taskList[taskCount];
+    int id = taskCount;
+    TaskoTask* t = &taskList[id];
     t->callback = func;
     t->arg = arg;
     t->intervalMs = intervalMs;
@@ -90,8 +91,8 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
                 vTaskDelete(NULL);
             },
             "TaskoOnce",
-            2048,
-            (void*)(intptr_t)taskCount,
+            4096,
+            (void*)(intptr_t)id,
             priority,
             NULL,
             core
