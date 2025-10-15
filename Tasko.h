@@ -57,6 +57,7 @@ static void TaskoTimerCallback(TimerHandle_t xTimer) {
     if (!taskList[idx].active) return;
 
     if (taskList[idx].pendingRemove) {
+        taskList[idx].active = false; // stop further execution
         xTimerDelete(taskList[idx].timer, 0);
         taskList[idx].timer = NULL;
         return;
