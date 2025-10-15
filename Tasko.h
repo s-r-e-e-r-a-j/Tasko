@@ -40,7 +40,7 @@ static bool taskoDebug = false;
 
 // Enable debug logging
 static inline void TaskoEnableDebug(bool enable) { taskoDebug = enable; }
-static inline void TaskoLog(const char* msg, int id = -1) {
+static inline void TaskoLog(const char* msg, int id) {
     if (taskoDebug) {
         if (id >= 0) Serial.printf("[Tasko] %s (id=%d)\n", msg, id);
         else Serial.printf("[Tasko] %s\n", msg);
