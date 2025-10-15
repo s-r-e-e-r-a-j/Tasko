@@ -103,16 +103,16 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
     return taskCount++;
 }
 
-// Remove task safely (deferred if running)
+// Remove task safely (If it’s running, wait and remove it later)
 static void TaskoRemove(int id) {
     if (id < 0 || id >= taskCount) return;
     TaskoTask* t = &taskList[id];
     t->active = false;
 
-    // If task is a running task, defer removal
+    // If the task is still running, wait before removing it.
     if (t->handle == xTaskGetCurrentTaskHandle()) {
         t->pendingRemove = true;
-        if (taskoDebug) TaskoLog("Deferred removal of running task");
+        if (taskoDebug) TaskoLog("Wait to remove running task");
         return;
     }
 
