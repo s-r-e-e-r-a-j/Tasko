@@ -31,6 +31,7 @@ typedef struct {
     bool repeating;
     bool active;
     bool pendingRemove; // for deferred removal
+    bool used;
 } TaskoTask;
 
 static TaskoTask taskList[TASKO_MAX_TASKS];
@@ -74,7 +75,14 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
                     TaskoHook startHook, TaskoHook stopHook) {
     if (taskCount >= TASKO_MAX_TASKS) return -1;
 
-    int id = taskCount;
+    int id = -1;
+    for (int i = 0; i < TASKO_MAX_TASKS; i++) {
+        if (!taskList[i].used) {
+            id = i;
+            break;
+        }
+    }
+    if (id == -1) return -1; // no free slot
     TaskoTask* t = &taskList[id];
     t->callback = func;
     t->arg = arg;
@@ -86,6 +94,7 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
     t->onStart = startHook;
     t->onStop = stopHook;
     t->pendingRemove = false;
+    t->used = true;
 
     if (repeat) {
         t->timer = xTimerCreate("TaskoTimer", pdMS_TO_TICKS(intervalMs), pdTRUE,
@@ -125,6 +134,7 @@ static void TaskoRemove(int id) {
         vTaskDelete(t->handle);
         t->handle = NULL;
     }
+    t->used = false;
     if (taskoDebug) TaskoLog("Removed task immediately");
 }
 
