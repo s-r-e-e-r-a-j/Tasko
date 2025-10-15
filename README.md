@@ -115,6 +115,7 @@ void setup() {
     // Start the Serial monitor for output
     Serial.begin(115200);
 
+    delay(1000);
     // Set the built-in LED pin as output
     pinMode(LED_BUILTIN, OUTPUT);
 
@@ -127,7 +128,7 @@ void setup() {
 
     // Add a one-time task that prints a message
     // The startHook and stopHook functions are also called for this task
-    int onceId = TaskoAdd(runOnce, NULL, 0, false, 1, 1, onStart, onStop);
+    int onceId = TaskoAdd(runOnce, NULL, 10, false, 1, 1, onStart, onStop);
 }
 
 void loop() {
