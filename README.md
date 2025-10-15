@@ -127,11 +127,11 @@ void setup() {
 
     // Add a repeating task that blinks the LED every 1000 milliseconds
     // The startHook and stopHook functions are called before and after each execution
-    int blinkId = TaskoAdd(blinkTask, NULL, 1000, true, 1, 1, onStart, onStop);
+    int blinkId = TaskoAdd(blinkTask, NULL, 1000, true, 1, 1, onStart, onStop, 4096);
 
     // Add a one-time task that prints a message
     // The startHook and stopHook functions are also called for this task
-    int onceId = TaskoAdd(runOnce, NULL, 10, false, 1, 1, onStart, onStop);
+    int onceId = TaskoAdd(runOnce, NULL, 10, false, 1, 1, onStart, onStop, 4096);
 }
 
 void loop() {
