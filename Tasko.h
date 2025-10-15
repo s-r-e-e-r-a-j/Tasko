@@ -52,8 +52,13 @@ static bool taskoDebug = false;
 static inline void TaskoEnableDebug(bool enable) { taskoDebug = enable; }
 static inline void TaskoLog(const char* msg, int id) {
     if (taskoDebug) {
-        if (id >= 0) Serial.printf("[Tasko] %s (id=%d)\n", msg, id);
-        else Serial.printf("[Tasko] %s\n", msg);
+        #ifdef ARDUINO
+               if (id >= 0) Serial.printf("[Tasko] %s (id=%d)\n", msg, id);
+               else Serial.printf("[Tasko] %s\n", msg);
+        #else
+              if (id >= 0) printf("[Tasko] %s (id=%d)\n", msg, id);
+               else printf("[Tasko] %s\n", msg);
+        #endif
     }
 }
 
