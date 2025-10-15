@@ -102,10 +102,11 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
         t->handle = NULL;
         if (taskoDebug) TaskoLog("Added repeating task");
     } else {
-        t->handle = NULL;
+        TaskHandle_t tmpHandle = NULL;
         xTaskCreatePinnedToCore(TaskoOneTimeWrapper, "TaskoOnce",
                                 4096, (void*)(intptr_t)id,
-                                priority, &t->handle, core);
+                                priority, &tmpHandle, core);
+        t->handle = tmpHandle;
         if (taskoDebug) TaskoLog("Added one-time task");
     }
 
