@@ -135,7 +135,7 @@ static void TaskoRemove(int id) {
         t->handle = NULL;
     }
     t->used = false;
-    taskCount--
+    taskCount--;
     if (taskoDebug) TaskoLog("Removed task immediately");
 }
 
