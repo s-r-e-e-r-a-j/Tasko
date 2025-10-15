@@ -58,7 +58,6 @@ static void TaskoTimerCallback(TimerHandle_t xTimer) {
     if (!taskList[idx].active) return;
 
     if (taskList[idx].pendingRemove) {
-        taskList[idx].active = false; // stop further execution
         xTimerDelete(taskList[idx].timer, 0);
         taskList[idx].timer = NULL;
         return;
@@ -106,7 +105,7 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
         t->handle = NULL;
         xTaskCreatePinnedToCore(TaskoOneTimeWrapper, "TaskoOnce",
                                 4096, (void*)(intptr_t)id,
-                                priority, &t->handle, core);
+                                priority, NULL, core);
         if (taskoDebug) TaskoLog("Added one-time task");
     }
 
