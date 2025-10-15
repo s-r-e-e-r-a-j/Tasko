@@ -69,8 +69,8 @@ static void TaskoTimerCallback(TimerHandle_t xTimer) {
 
 // Add task
 static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool repeat,
-                    uint8_t priority = 1, uint8_t core = 1,
-                    TaskoHook startHook = NULL, TaskoHook stopHook = NULL) {
+                    uint8_t priority, uint8_t core,
+                    TaskoHook startHook, TaskoHook stopHook) {
     if (taskCount >= TASKO_MAX_TASKS) return -1;
 
     int id = taskCount;
