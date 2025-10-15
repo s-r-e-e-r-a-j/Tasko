@@ -115,7 +115,7 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
 
 // Remove task safely (If it’s running, wait and remove it later)
 static void TaskoRemove(int id) {
-    if (id < 0 || id >= taskCount) return;
+    if (id < 0 || id >= TASKO_MAX_TASKS || !taskList[id].used) return;
     TaskoTask* t = &taskList[id];
     t->active = false;
 
@@ -139,7 +139,9 @@ static void TaskoRemove(int id) {
 }
 
 static void TaskoClearAll() {
-    for (uint8_t i = 0; i < taskCount; i++) TaskoRemove(i);
+    for (int i = 0; i < TASKO_MAX_TASKS; i++) {
+    if (taskList[i].used) TaskoRemove(i);
+    }
     taskCount = 0;
     if (taskoDebug) TaskoLog("Cleared all tasks");
 }
