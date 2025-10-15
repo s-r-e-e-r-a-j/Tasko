@@ -5,10 +5,20 @@
 extern "C" {
 #endif
 
+#ifdef ARDUINO
 #include <Arduino.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/timers.h"
+#else
+#include <stdio.h>
+#include <stdint.h>
+#include <stddef.h> 
+#include <stdbool.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/timers.h"
+#endif
 
 // Maximum tasks allowed
 #ifndef TASKO_MAX_TASKS
