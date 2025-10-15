@@ -30,7 +30,7 @@ typedef struct {
     uint8_t core;
     bool repeating;
     bool active;
-    bool pendingRemove; // for deferred removal
+    bool pendingRemove;
     bool used;
 } TaskoTask;
 
@@ -40,51 +40,71 @@ static bool taskoDebug = false;
 
 // Enable debug logging
 static inline void TaskoEnableDebug(bool enable) { taskoDebug = enable; }
-static inline void TaskoLog(const char* msg) { if (taskoDebug) Serial.println(msg); }
+static inline void TaskoLog(const char* msg, int id = -1) {
+    if (taskoDebug) {
+        if (id >= 0) Serial.printf("[Tasko] %s (id=%d)\n", msg, id);
+        else Serial.printf("[Tasko] %s\n", msg);
+    }
+}
 
 // One-time task wrapper
 static void TaskoOneTimeWrapper(void* param) {
     int idx = (int)(intptr_t)param;
-    if (taskList[idx].onStart) taskList[idx].onStart(idx);
-    if (taskList[idx].callback) taskList[idx].callback(taskList[idx].arg);
-    if (taskList[idx].onStop) taskList[idx].onStop(idx);
-    taskList[idx].active = false;
-    vTaskDelete(NULL); // never return
+    if (idx < 0 || idx >= TASKO_MAX_TASKS) return;
+
+    TaskoTask* t = &taskList[idx];
+    if (!t->used) return;
+
+    if (t->onStart) t->onStart(idx);
+    if (t->callback) t->callback(t->arg);
+    if (t->onStop) t->onStop(idx);
+
+    t->active = false;
+    t->used = false;
+    taskCount--;
+
+    vTaskDelete(NULL); // safe deletion
 }
 
 // Timer callback wrapper
 static void TaskoTimerCallback(TimerHandle_t xTimer) {
     int idx = (int)(intptr_t)pvTimerGetTimerID(xTimer);
-    if (!taskList[idx].active) return;
+    if (idx < 0 || idx >= TASKO_MAX_TASKS) return;
 
-    if (taskList[idx].pendingRemove) {
-        xTimerDelete(taskList[idx].timer, 0);
-        taskList[idx].timer = NULL;
-        taskList[idx].used = false;
-        taskList[idx].pendingRemove = false;
+    TaskoTask* t = &taskList[idx];
+    if (!t->used || !t->active) return;
+
+    if (t->pendingRemove) {
+        if (t->timer != NULL) {
+            xTimerDelete(t->timer, 0);
+            t->timer = NULL;
+        }
+        t->used = false;
+        t->pendingRemove = false;
         taskCount--;
+        TaskoLog("Removed pending repeating task", idx);
         return;
     }
 
-    if (taskList[idx].onStart) taskList[idx].onStart(idx);
-    if (taskList[idx].callback) taskList[idx].callback(taskList[idx].arg);
-    if (taskList[idx].onStop) taskList[idx].onStop(idx);
+    if (t->onStart) t->onStart(idx);
+    if (t->callback) t->callback(t->arg);
+    if (t->onStop) t->onStop(idx);
 }
 
 // Add task
 static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool repeat,
                     uint8_t priority, uint8_t core,
-                    TaskoHook startHook, TaskoHook stopHook) {
+                    TaskoHook startHook, TaskoHook stopHook,
+                    size_t stackSize = 4096) {
+
     if (taskCount >= TASKO_MAX_TASKS) return -1;
 
     int id = -1;
     for (int i = 0; i < TASKO_MAX_TASKS; i++) {
-        if (!taskList[i].used) {
-            id = i;
-            break;
-        }
+        if (!taskList[i].used) { id = i; break; }
     }
-    if (id == -1) return -1; // no free slot
+    if (id == -1) return -1;
+
     TaskoTask* t = &taskList[id];
     t->callback = func;
     t->arg = arg;
@@ -101,69 +121,76 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
     if (repeat) {
         t->timer = xTimerCreate("TaskoTimer", pdMS_TO_TICKS(intervalMs), pdTRUE,
                                 (void*)(intptr_t)id, TaskoTimerCallback);
-        xTimerStart(t->timer, 0);
+        if (t->timer) xTimerStart(t->timer, 0);
         t->handle = NULL;
-        if (taskoDebug) TaskoLog("Added repeating task");
+        TaskoLog("Added repeating task", id);
     } else {
         TaskHandle_t tmpHandle = NULL;
         xTaskCreatePinnedToCore(TaskoOneTimeWrapper, "TaskoOnce",
-                                4096, (void*)(intptr_t)id,
+                                stackSize, (void*)(intptr_t)id,
                                 priority, &tmpHandle, core);
         t->handle = tmpHandle;
-        if (taskoDebug) TaskoLog("Added one-time task");
+        TaskoLog("Added one-time task", id);
     }
+
     taskCount++;
     return id;
 }
 
-// Remove task safely (If it’s running, wait and remove it later)
+// Remove task safely
 static void TaskoRemove(int id) {
-    if (id < 0 || id >= TASKO_MAX_TASKS || !taskList[id].used) return;
+    if (id < 0 || id >= TASKO_MAX_TASKS) return;
+
     TaskoTask* t = &taskList[id];
+    if (!t->used) return;
+
     t->active = false;
 
-    // If the task is still running, wait before removing it.
     if (t->handle == xTaskGetCurrentTaskHandle()) {
         t->pendingRemove = true;
-        if (taskoDebug) TaskoLog("Wait to remove running task");
+        TaskoLog("Pending removal of running task", id);
         return;
     }
 
-    if (t->timer) {
+    if (t->timer != NULL) {
         xTimerDelete(t->timer, 0);
         t->timer = NULL;
     }
-    if (t->handle) {
+
+    if (t->handle != NULL) {
         vTaskDelete(t->handle);
         t->handle = NULL;
     }
+
     t->used = false;
     taskCount--;
-    if (taskoDebug) TaskoLog("Removed task immediately");
+    TaskoLog("Removed task immediately", id);
 }
 
+// Clear all tasks
 static void TaskoClearAll() {
     for (int i = 0; i < TASKO_MAX_TASKS; i++) {
-    if (taskList[i].used) TaskoRemove(i);
+        if (taskList[i].used) TaskoRemove(i);
     }
-    taskCount = 0;
-    if (taskoDebug) TaskoLog("Cleared all tasks");
 }
 
+// Pause / Resume
 static void TaskoPause(int id) {
-    if (id < 0 || id >= TASKO_MAX_TASKS || !taskList[id].used) return;
+    if (id < 0 || id >= TASKO_MAX_TASKS) return;
     TaskoTask* t = &taskList[id];
+    if (!t->used) return;
     t->active = false;
     if (t->timer) xTimerStop(t->timer, 0);
-    if (taskoDebug) TaskoLog("Paused task");
+    TaskoLog("Paused task", id);
 }
 
 static void TaskoResume(int id) {
-    if (id < 0 || id >= TASKO_MAX_TASKS || !taskList[id].used) return;
+    if (id < 0 || id >= TASKO_MAX_TASKS) return;
     TaskoTask* t = &taskList[id];
+    if (!t->used) return;
     t->active = true;
     if (t->timer) xTimerStart(t->timer, 0);
-    if (taskoDebug) TaskoLog("Resumed task");
+    TaskoLog("Resumed task", id);
 }
 
 #ifdef __cplusplus
