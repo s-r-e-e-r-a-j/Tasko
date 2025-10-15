@@ -110,7 +110,7 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
         if (taskoDebug) TaskoLog("Added one-time task");
     }
 
-    return taskCount++;
+    return id;
 }
 
 // Remove task safely (If it’s running, wait and remove it later)
