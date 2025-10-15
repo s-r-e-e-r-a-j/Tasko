@@ -60,6 +60,9 @@ static void TaskoTimerCallback(TimerHandle_t xTimer) {
     if (taskList[idx].pendingRemove) {
         xTimerDelete(taskList[idx].timer, 0);
         taskList[idx].timer = NULL;
+        taskList[idx].used = false;
+        taskList[idx].pendingRemove = false;
+        taskCount--;
         return;
     }
 
