@@ -109,7 +109,7 @@ static int TaskoAdd(TaskoCallback func, void* arg, uint32_t intervalMs, bool rep
         t->handle = tmpHandle;
         if (taskoDebug) TaskoLog("Added one-time task");
     }
-
+    taskCount++;
     return id;
 }
 
@@ -135,6 +135,7 @@ static void TaskoRemove(int id) {
         t->handle = NULL;
     }
     t->used = false;
+    taskCount--
     if (taskoDebug) TaskoLog("Removed task immediately");
 }
 
@@ -147,7 +148,7 @@ static void TaskoClearAll() {
 }
 
 static void TaskoPause(int id) {
-    if (id < 0 || id >= taskCount) return;
+    if (id < 0 || id >= TASKO_MAX_TASKS || !taskList[id].used) return;
     TaskoTask* t = &taskList[id];
     t->active = false;
     if (t->timer) xTimerStop(t->timer, 0);
@@ -155,7 +156,7 @@ static void TaskoPause(int id) {
 }
 
 static void TaskoResume(int id) {
-    if (id < 0 || id >= taskCount) return;
+    if (id < 0 || id >= TASKO_MAX_TASKS || !taskList[id].used) return;
     TaskoTask* t = &taskList[id];
     t->active = true;
     if (t->timer) xTimerStart(t->timer, 0);
