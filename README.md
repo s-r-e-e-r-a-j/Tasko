@@ -63,9 +63,9 @@ The function `TaskoAdd` **creates and starts a task** in Tasko. It can either be
 
 Returns the task ID of the newly created task on success (from `0` to `TASKO_MAX_TASKS - 1`), or `-1` if the maximum number of tasks has been reached.
 
-- **func** → The task callback function that will be executed by Tasko when the task runs
+- **func** → The task callback function that will be executed by Tasko when the task runs.It must include a `void* arg` parameter, which receives the pointer passed to the arg parameter in `TaskoAdd()`.
 
-- **arg** → A pointer to a single piece of data that will be passed to the task callback function when it runs. Use `NULL` if no data needs to be passed. Only one argument is directly supported.
+- **arg** → A pointer to a piece of data that will be passed to the task callback function via its `void* arg` parameter when the task runs. The callback must cast this pointer to the appropriate type before using it. Use `NULL` if no data needs to be passed. Only one argument is directly supported.
 
 - **intervalMs** → The time in **milliseconds** before the task runs again. For one-time tasks, it represents the delay before execution.
 
